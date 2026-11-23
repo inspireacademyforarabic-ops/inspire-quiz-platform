@@ -4,6 +4,9 @@ on:
   push:
     branches: [main]
 concurrency: deploy
+defaults:
+  run:
+    working-directory: app
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -16,6 +19,15 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - name: Unpack the project from the zip
+        working-directory: .
+        run: |
+          Z=$(ls *.zip 2>/dev/null | head -1)
+          test -n "$Z" || { echo "Upload inspire-quiz-platform.zip to the repository first"; exit 1; }
+          rm -rf /tmp/p app && mkdir /tmp/p && unzip -q "$Z" -d /tmp/p
+          mv /tmp/p/* app
+          test -f app/package.json || { echo "The zip does not contain the project"; exit 1; }
+          ls app
       - name: Check secrets
         run: |
           test -n "$CLOUDFLARE_API_TOKEN" || { echo "Add the CLOUDFLARE_API_TOKEN secret"; exit 1; }
