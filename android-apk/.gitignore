@@ -1,0 +1,5 @@
+build/
+*.keystore
+.storepass
+assets/www/
+res/mipmap-xxxhdpi/
