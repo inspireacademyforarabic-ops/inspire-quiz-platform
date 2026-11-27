@@ -8,12 +8,38 @@
 <style>
   :root { color-scheme: light; }
   * { box-sizing: border-box; }
-  body { margin: 0; min-height: 100vh; font: 16px/1.5 system-ui, sans-serif; color: #10243a; background: #f3f7fb; display: grid; place-items: center; padding: 24px 16px; }
-  main { width: min(440px, 100%); background: #fff; border: 1px solid #dbe5ef; border-radius: 20px; padding: 22px 18px 18px; box-shadow: 0 10px 30px rgba(11, 36, 58, 0.08); }
-  .mark { width: 48px; height: 48px; border-radius: 12px; display: grid; place-items: center; background: linear-gradient(135deg, #0b4f9c, #0b7d88); color: #fff; font-weight: 800; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font: 16px/1.5 system-ui, sans-serif;
+    color: #10243a;
+    background: #f3f7fb;
+    display: grid;
+    place-items: center;
+    padding: 24px 16px;
+  }
+  main {
+    width: min(440px, 100%);
+    background: #fff;
+    border: 1px solid #dbe5ef;
+    border-radius: 20px;
+    padding: 22px 18px 18px;
+    box-shadow: 0 10px 30px rgba(11, 36, 58, 0.08);
+  }
+  .mark {
+    width: 48px; height: 48px; border-radius: 12px;
+    display: grid; place-items: center;
+    background: linear-gradient(135deg, #0b4f9c, #0b7d88);
+    color: #fff; font-weight: 800;
+  }
   h1 { font-size: 1.35rem; margin: 12px 0 6px; }
   p { margin: 0 0 12px; color: #4a6076; }
-  a.btn { display: flex; align-items: center; justify-content: center; width: 100%; min-height: 48px; margin-top: 10px; border-radius: 999px; border: 0; cursor: pointer; font: 600 15px/1 system-ui, sans-serif; text-decoration: none; }
+  a.btn, button.btn {
+    display: flex; align-items: center; justify-content: center;
+    width: 100%; min-height: 48px; margin-top: 10px;
+    border-radius: 999px; border: 0; cursor: pointer;
+    font: 600 15px/1 system-ui, sans-serif; text-decoration: none;
+  }
   .primary { background: #0b4f9c; color: #fff; }
   .ghost { background: #f3f7fb; color: #10243a; border: 1px solid #dbe5ef; }
   small { display: block; margin-top: 14px; color: #4a6076; }
@@ -24,28 +50,33 @@
   <div class="mark">IA</div>
   <h1>Android app that stays live</h1>
   <p id="lead">Install it once and connect it to the published academy. After that, new quizzes, students, and edits show up the next time the phone app is opened. You do not install a new file for ordinary changes.</p>
-  <a class="btn primary" id="apk" href="INSPIRE-Academy.apk">Download the app</a>
+  <a class="btn primary" id="apk" href="INSPIRE-Academy.apk" download="INSPIRE-Academy.apk">Download the app</a>
   <a class="btn ghost" id="live" href="#">Open the live app</a>
-  <small id="note">Open the live app after the install finishes.</small>
+  <small id="note">Open the live app after the install finishes. Admin is already signed in on the website the app loads.</small>
 </main>
 <script>
 (function () {
+  var path = location.pathname;
   var host = location.hostname.toLowerCase();
   var previewHost = host === "preview.grok.genai.mil" || host === "preview.grok.mil" || host === "preview.grokgsac.com" || host.endsWith(".grok-sandbox.com") || host === "localhost" || host === "127.0.0.1";
   var prefix = "";
-  var match = location.pathname.match(/^\/hds-[a-z0-9]+-\d+-[a-z0-9]+/i);
+  var match = path.match(/^\/hds-[a-z0-9]+-\d+-[a-z0-9]+/i);
   if (previewHost && match) prefix = match[0];
   var apkPath = (prefix || "") + "/downloads/INSPIRE-Academy.apk";
   document.getElementById("apk").href = apkPath;
   var live = document.getElementById("live");
+  var note = document.getElementById("note");
+  var lead = document.getElementById("lead");
   if (previewHost || location.protocol !== "https:") {
     live.style.display = "none";
-    document.getElementById("lead").textContent = "Publish the academy first, then open this page on the public site and tap Open the live app.";
+    lead.textContent = "This preview cannot update a phone. Publish the academy, open the public site on the phone, then download the app and tap Open the live app once.";
+    note.textContent = "After that one connection, published changes show up when the app is opened again. You do not reinstall for ordinary edits.";
     return;
   }
   var base = location.origin;
   var apk = location.origin + apkPath;
   live.href = "intent://live?base=" + encodeURIComponent(base) + "#Intent;scheme=inspireacademy;package=com.inspireacademy.quiz;S.browser_fallback_url=" + encodeURIComponent(apk) + ";end";
+  note.textContent = "Install the file, come back, and tap Open the live app. The phone then loads this website, so later published changes appear when the app is opened.";
 })();
 </script>
 </body>
